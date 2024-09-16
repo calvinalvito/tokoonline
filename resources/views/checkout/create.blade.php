@@ -43,10 +43,25 @@
                     </li>
                 </ul>
                 <div class="d-flex user-logged">
-                    <a href="#">
-                        Halo, Beatrice!
-                        <img src="{{asset('images/user_photo.png')}}" class="user-photo" alt="">
-                    </a>
+                        <a href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+                            Halo, {{Auth::user()->name}}!
+                            @if (Auth::user()->avatar)
+                            <img src="{{Auth::user()->avatar}}" class="user-photo" alt="" style="border-radius: 50%">
+                            @else
+                            <img src="https://ui-avatars.com/api/?name=Admin" class="user-photo" alt="" style="border-radius: 50%">
+                            @endif
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink" style="right: 0; left: auto">
+                                <li>
+                                    <a href="{{route('dashboard')}}" class="dropdown-item">My Dashboard</a>
+                                </li>
+                                <li>
+                                    <a href="#" class="dropdown-item" onclick="event.preventDefault(); document.getElementById('logout-form').submit()">Sign Out</a>
+                                    <form id="logout-form" action="{{route('logout')}}" method="post" style="display: none">
+                                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                                    </form>
+                                </li>
+                            </ul>
+                        </a>
                 </div>
             </div>
         </div>
@@ -72,7 +87,7 @@
                             <div class="item-bootcamp">
                                 <img src="{{asset('images/item_bootcamp.png')}}" alt="" class="cover">
                                 <h1 class="package">
-                                    GILA BELAJAR
+                                    {{$camp->title}}
                                 </h1>
                                 <p class="description">
                                     Bootcamp ini akan mengajak Anda untuk belajar penuh mulai dari pengenalan dasar sampai membangun sebuah projek asli
@@ -81,34 +96,42 @@
                         </div>
                         <div class="col-lg-1 col-12"></div>
                         <div class="col-lg-6 col-12">
-                            <form action="{{route('succes_checkout')}}" class="basic-form">
+                            <form action="{{route('checkout.store', $camp->id)}}" class="basic-form" method="POST">
+                                @csrf
                                 <div class="mb-4">
-                                    <label for="exampleInputEmail1" class="form-label">Full Name</label>
-                                    <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                                    <label  class="form-label">Full Name</label>
+                                    <input name="name" type="text" class="form-control {{$errors->has('name') ? 'is-invalid' : ''}}" value="{{Auth::user()->name}}" required />
+                                    @if ($errors->has('name'))
+                                        <p class="text-danger">{{$errors->first('name')}}</p>
+                                    @endif
                                 </div>
                                 <div class="mb-4">
-                                    <label for="exampleInputEmail1" class="form-label">Email Address</label>
-                                    <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                                    <label  class="form-label">Email Address</label>
+                                    <input name="email" type="email" class="form-control {{$errors->has('email') ? 'is-invalid' : ''}}" value="{{Auth::user()->email}}" required />
+                                    @if ($errors->has('email'))
+                                        <p class="text-danger">{{$errors->first('email')}}</p>
+                                    @endif
                                 </div>
                                 <div class="mb-4">
-                                    <label for="exampleInputEmail1" class="form-label">Occupation</label>
-                                    <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                                    <label  class="form-label">Occupation</label>
+                                    <input name="occupation" type="text" class="form-control {{$errors->has('email') ? 'is-invalid' : ''}}" value="{{old('occupation') ?: Auth::user()->occupation}}" required />
+                                    @if ($errors->has('occupation'))
+                                        <p class="text-danger">{{$errors->first('occupation')}}</p>
+                                    @endif
                                 </div>
                                 <div class="mb-4">
-                                    <label for="exampleInputEmail1" class="form-label">Card Number</label>
-                                    <input type="number" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                                    <label class="form-label">Phone</label>
+                                    <input name="phone" type="text" class="form-control {{$errors->has('phone') ? 'is-invalid' : ''}}" value="{{old('phone') ?: Auth::user()->phone}}" required />
+                                    @if ($errors->has('phone'))
+                                        <p class="text-danger">{{$errors->first('phone')}}</p>
+                                    @endif
                                 </div>
-                                <div class="mb-5">
-                                    <div class="row">
-                                        <div class="col-lg-6 col-12">
-                                            <label for="exampleInputEmail1" class="form-label">Expired</label>
-                                            <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
-                                        </div>
-                                        <div class="col-lg-6 col-12">
-                                            <label for="exampleInputEmail1" class="form-label">CVC</label>
-                                            <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
-                                        </div>
-                                    </div>
+                                <div class="mb-4">
+                                    <label class="form-label">Address</label>
+                                    <input name="address" type="text" class="form-control {{$errors->has('address') ? 'is-invalid' : ''}}" value="{{old('address') ?: Auth::user()->address}}" required />
+                                    @if ($errors->has('address'))
+                                        <p class="text-danger">{{$errors->first('address')}}</p>
+                                    @endif
                                 </div>
                                 <button type="submit" class="w-100 btn btn-primary">Pay Now</button>
                                 <p class="text-center subheader mt-4">
